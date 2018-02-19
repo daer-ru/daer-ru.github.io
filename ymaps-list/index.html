@@ -99,6 +99,15 @@
     </div>
 
     <div class="container-fluid">
+        <hr class="my-5">
+        <h2 class="mb-5">Кастомизированная карта</h2>
+    </div>
+
+    <div id="ymaps-custom" class="ylist">
+        <div id="ymaps-custom-map" class="ylist__map-container"></div>
+    </div>
+
+    <div class="container-fluid">
         <div class="jumbotron mt-5 mb-0 pt-4 pb-4">
             <a class="btn btn-dark btn-sm" href="https://github.com/daer-ru/ymaps-list" role="button"><i class="fa fa-github" aria-hidden="true"></i> Github</a>
         </div>
@@ -185,6 +194,20 @@
             container: 'ymaps-full',
             map: {
                 center: [55.751574, 37.573856],
+                customize: {
+                    controls: [
+                        {
+                            constructor: 'ZoomControl',
+                            options: {
+                                size: 'small',
+                                position: {
+                                    top: 10,
+                                    right: 10
+                                }
+                            }
+                        }
+                    ]
+                },
                 container: 'ymaps-full-map',
                 drag: {
                     disableBeforeBreakpoint: true,
@@ -291,6 +314,20 @@
             container: 'ymaps',
             map: {
                 center: [55.751574, 37.573856],
+                customize: {
+                    controls: [
+                        {
+                            constructor: 'ZoomControl',
+                            options: {
+                                size: 'small',
+                                position: {
+                                    top: 10,
+                                    right: 10
+                                }
+                            }
+                        }
+                    ]
+                },
                 container: 'ymaps-map',
                 drag: {
                     disableBeforeBreakpoint: true,
@@ -391,6 +428,20 @@
             container: 'ymaps-static',
             map: {
                 center: [55.751574, 37.573856],
+                customize: {
+                    controls: [
+                        {
+                            constructor: 'ZoomControl',
+                            options: {
+                                size: 'small',
+                                position: {
+                                    top: 10,
+                                    right: 10
+                                }
+                            }
+                        }
+                    ]
+                },
                 container: 'ymaps-static-map',
                 drag: {
                     disableBeforeBreakpoint: true,
@@ -491,6 +542,20 @@
             container: 'ymaps-balloon-overflow',
             map: {
                 center: [55.751574, 37.573856],
+                customize: {
+                    controls: [
+                        {
+                            constructor: 'ZoomControl',
+                            options: {
+                                size: 'small',
+                                position: {
+                                    top: 10,
+                                    right: 10
+                                }
+                            }
+                        }
+                    ]
+                },
                 container: 'ymaps-balloon-overflow-map',
                 drag: {
                     disableBeforeBreakpoint: true,
@@ -558,6 +623,144 @@
         });
 
         ymapsBalloonOverflow.init();
+
+
+        var ymapsCustom = new Ylist({
+            data: data,
+            dataOrder: [
+                'name',
+                'address',
+                'phone',
+                'email',
+                'description'
+            ],
+            dataExtension: {
+                address: function(address, pointData) {
+                    let extendedAddress = `<p class="ylist-balloon__address">${address}</p>`;
+                    return extendedAddress;
+                },
+                phone: function(phone, pointData) {
+                    let phoneLink = phone.replace(/[\ \-\(\)']+/g, '');
+                    let extendedPhone = `<p class="ylist-balloon__phone"><a href="tel:${phoneLink}">${phone}</a></p>`;
+                    return extendedPhone;
+                },
+                email: function(email, pointData) {
+                    let extendedEmail = `<p class="ylist-balloon__email"><a href="mailto:${email}">${email}</a></p>`;
+                    return extendedEmail;
+                },
+                description: function(description, pointData) {
+                    let extendedDescription = `<p class="ylist-balloon__description">${description}</p>`;
+                    return extendedDescription;
+                },
+            },
+            container: 'ymaps-custom',
+            map: {
+                center: [55.751574, 37.573856],
+                customize: {
+                    state: {
+                        type: 'yandex#satellite'
+                    },
+                    options: {
+                        suppressMapOpenBlock: true
+                    },
+                    controls: [
+                        {
+                            constructor: 'ZoomControl',
+                            options: {
+                                size: 'small',
+                                position: {
+                                    top: 50,
+                                    left: 10
+                                }
+                            }
+                        },
+                        {
+                            constructor: 'FullscreenControl',
+                            options: {
+                                position: {
+                                    bottom: 10,
+                                    left: 10
+                                }
+                            }
+                        },
+                        {
+                            constructor: 'SearchControl',
+                            options: {
+                                position: {
+                                    top: 10,
+                                    left: 10
+                                },
+                                size: 'small'
+                            }
+                        }
+                    ]
+                },
+                container: 'ymaps-custom-map',
+                drag: {
+                    disableBeforeBreakpoint: true,
+                    disableAfterBreakpoint: false
+                },
+                tooltip: {
+                    active: true,
+                    tooltipText: 'Чтобы переместить карту, проведите по ней двумя пальцами'
+                }
+            },
+            list: {
+                active: false
+            },
+            cluster: {
+                icons: [
+                    [
+                        {
+                            href: 'img/pin_empty.svg',
+                            size: [40, 50],
+                            offset: [-20, -30]
+                        },
+                        {
+                            href: 'img/pin_empty.svg',
+                            size: [60, 75],
+                            offset: [-30, -37]
+                        }
+                    ],
+                    [
+                        {
+                            href: 'img/pin_empty_active.svg',
+                            size: [40, 50],
+                            offset: [-20, -30]
+                        },
+                        {
+                            href: 'img/pin_empty_active.svg',
+                            size: [60, 75],
+                            offset: [-30, -37]
+                        }
+                    ]
+                ],
+                inlineStyle: 'color: #fff; padding-left: 2px; text-align: center; font: bold 16px/44px Helvetica, Helvetica CY, Arial, Nimbus Sans L, sans-serif;'
+            },
+            placemark: {
+                icons: [
+                    {
+                        href: 'img/pin.svg',
+                        size: [40, 50],
+                        offset: [-20, -50]
+                    },
+                    {
+                        href: 'img/pin_active.svg',
+                        size: [40, 50],
+                        offset: [-20, -50]
+                    }
+                ]
+            },
+            balloon: {
+                activeBeforeBreakpoint: true,
+                activeAfterBreakpoint: true,
+                closeButton: '<span>x</span>',
+                header: true
+            },
+            adaptiveBreakpoint: 1024
+        });
+
+        ymapsCustom.init();
     </script>
 </body>
 </html>
