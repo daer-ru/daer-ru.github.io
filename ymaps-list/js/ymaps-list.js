@@ -96,6 +96,10 @@ var Ylist = function () {
                 return;
             }
 
+            if (!this.options.hasOwnProperty('afterInit')) {
+                this.options.afterInit = false;
+            }
+
             // Map
             if (!this.options.hasOwnProperty('map')) {
                 this.options.map = {};
@@ -169,6 +173,10 @@ var Ylist = function () {
 
                     if (!this.options.map.filterTooltip.hasOwnProperty('text')) {
                         this.options.map.filterTooltip.text = 'No matches found';
+                    }
+
+                    if (!this.options.map.filterTooltip.hasOwnProperty('container')) {
+                        this.options.map.filterTooltip.container = '#' + this.options.container;
                     }
                 }
             }
@@ -349,6 +357,13 @@ var Ylist = function () {
                     // Если при инициализации карты есть активный элемент списка
                     // и если разрешено отображение балуна
                     self._openPlacemarkBalloon(self.activeListItem);
+                }
+
+                if (typeof self.options.afterInit == 'function') {
+                    // Если есть колбек afterInit вызываем его
+                    var $mainContainer = $('#' + self.options.container);
+
+                    self.options.afterInit($mainContainer);
                 }
             });
 
@@ -1410,6 +1425,7 @@ var Ylist = function () {
             var points = self.points,
                 placemarks = self.placemarks,
                 falseFilterCounter = 0,
+                filterTooltipContainer = self.options.map.filterTooltip.container,
                 $filterTooltip = $('<div class="ylist-filter-tooltip">\n                                    <span class="ylist-filter-tooltip__text">' + self.options.map.filterTooltip.text + '</span>\n                                </div>');
 
             if (self.map && !placemarks.length) {
@@ -1450,15 +1466,15 @@ var Ylist = function () {
             if (falseFilterCounter == points.length) {
                 // Нет совпадений
                 if (self.options.map.filterTooltip.active) {
-                    $('#' + self.options.container + ' .ylist-filter-tooltip').remove();
-                    $('#' + self.options.container).append($filterTooltip);
-                    $('#' + self.options.container + ' .ylist-filter-tooltip').css('opacity', '1');
+                    $(filterTooltipContainer + ' .ylist-filter-tooltip').remove();
+                    $(filterTooltipContainer).append($filterTooltip);
+                    $(filterTooltipContainer + ' .ylist-filter-tooltip').css('opacity', '1');
                 } else {
                     console.warn(self.options.map.filterTooltip.text);
                 }
             } else {
                 if (self.options.map.filterTooltip.active) {
-                    $('#' + self.options.container + ' .ylist-filter-tooltip').remove();
+                    $(filterTooltipContainer + ' .ylist-filter-tooltip').remove();
                 }
 
                 // Масштабируем карту так, чтобы были видны все метки
@@ -1478,7 +1494,8 @@ var Ylist = function () {
     }, {
         key: 'clearFilter',
         value: function clearFilter() {
-            var self = this;
+            var self = this,
+                filterTooltipContainer = self.options.map.filterTooltip.container;
 
             // Сбрасываем колбек 
             self.currentFilterCallback = null;
@@ -1487,7 +1504,7 @@ var Ylist = function () {
 
             if (self.options.map.filterTooltip.active) {
                 // Удаляем тултип
-                $('#' + self.options.container + ' .ylist-filter-tooltip').remove();
+                $(filterTooltipContainer + ' .ylist-filter-tooltip').remove();
             }
 
             var points = self.points,
@@ -1511,6 +1528,33 @@ var Ylist = function () {
                     $('#' + self.options.list.container + ' .' + self.listClassName + '__item').show();
                 }
             }
+        }
+
+        /**
+         * Получает и возвращает объект с данными метки c {id}
+         * @param  {String} id  id метки в формате "#some-id" или "some-id"
+         * @return {Object}     данные метки
+         * @public
+         */
+
+    }, {
+        key: 'getPointData',
+        value: function getPointData(id) {
+            var self = this,
+                point = null;
+            var points = self.points;
+
+            // Можно передавать id как с решеткой, так и без решетки
+            id = id.replace(/^#/, '');
+
+            for (var i = 0; i < points.length; i++) {
+                if (points[i].id === id) {
+                    point = points[i];
+                    break;
+                }
+            }
+
+            return point;
         }
     }]);
 
